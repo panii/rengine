@@ -41,10 +41,10 @@ RUN apt update -y && apt install -y  --no-install-recommends \
     geoip-database
 
 
-# Download and install go 1.17
-RUN wget https://golang.org/dl/go1.17.2.linux-amd64.tar.gz
-RUN tar -xvf go1.17.2.linux-amd64.tar.gz
-RUN rm go1.17.2.linux-amd64.tar.gz
+# Download and install go 1.19
+RUN wget https://golang.google.cn/dl/go1.19.1.linux-amd64.tar.gz
+RUN tar -xvf go1.19.1.linux-amd64.tar.gz
+RUN rm go1.19.1.linux-amd64.tar.gz
 RUN mv go /usr/local
 
 # Download geckodriver
@@ -69,6 +69,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Download Go packages
+RUN go env -w GOPROXY=https://goproxy.cn,https://goproxy.io,direct
 RUN go install -v github.com/hakluke/hakrawler@latest
 
 RUN GO111MODULE=on go install -v -v github.com/bp0lr/gauplus@latest
@@ -96,8 +97,8 @@ RUN nuclei -update-templates
 
 # Copy requirements
 COPY ./requirements.txt /tmp/requirements.txt
-RUN pip3 install --upgrade setuptools pip && \
-    pip3 install -r /tmp/requirements.txt
+RUN pip3 install --upgrade setuptools pip -i https://pypi.tuna.tsinghua.edu.cn/simple && \
+    pip3 install -r /tmp/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # install eyewitness
 
@@ -105,7 +106,7 @@ RUN python3 -m pip install fuzzywuzzy \
     selenium \
     python-Levenshtein \
     pyvirtualdisplay \
-    netaddr
+    netaddr -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # Copy source code
 COPY . /usr/src/app/
